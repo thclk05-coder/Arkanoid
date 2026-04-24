@@ -2,16 +2,16 @@
 #include <vector>
 
 int main() {
-    sf::RenderWindow window(sf::VideoMode(800, 600), "Kocaeli Uni Arkanoid - Can Sistemi");
+    sf::RenderWindow window(sf::VideoMode(800, 600), "Kocaeli Uni Arkanoid - Canli Sistem");
     window.setFramerateLimit(60);
 
     // --- OYUN DEĞİŞKENLERİ ---
-    int lives = 3; // Başlangıçta 3 canımız var
+    int lives = 3;
 
     // --- RAKET (PADDLE) ---
-    sf::RectangleShape paddle(sf::Vector2f(100.f, 20.f));
+    sf::RectangleShape paddle(sf::Vector2f(120.f, 20.f));
     paddle.setFillColor(sf::Color::Green);
-    paddle.setPosition(350.f, 550.f);
+    paddle.setPosition(340.f, 550.f);
 
     // --- TOP (BALL) ---
     sf::CircleShape ball(10.f);
@@ -20,76 +20,61 @@ int main() {
     float ballSpeedX = 5.0f;
     float ballSpeedY = -5.0f;
 
-    // --- BLOKLAR (BRICKS) DİZİLİMİ ---
+    // --- TUĞLALAR (BRICKS) ---
     std::vector<sf::RectangleShape> bricks;
-    float brickWidth = 60.f;
-    float brickHeight = 20.f;
-    float padding = 10.f;
-    float startX = 55.f;
-    float startY = 50.f;
+    float startX = 50.f;
+    float startY = 80.f;
 
-    for (int row = 0; row < 5; ++row) {
-        for (int col = 0; col < 10; ++col) {
-            sf::RectangleShape brick(sf::Vector2f(brickWidth, brickHeight));
+    for (int i = 0; i < 5; ++i) {
+        for (int j = 0; j < 10; ++j) {
+            sf::RectangleShape brick(sf::Vector2f(65.f, 25.f));
             brick.setFillColor(sf::Color::Red);
-            float x = startX + col * (brickWidth + padding);
-            float y = startY + row * (brickHeight + padding);
-            brick.setPosition(x, y);
+            brick.setOutlineThickness(1.f);
+            brick.setOutlineColor(sf::Color::Black);
+            brick.setPosition(startX + j * 70.f, startY + i * 30.f);
             bricks.push_back(brick);
         }
     }
 
+    // --- ANA OYUN DÖNGÜSÜ ---
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) window.close();
         }
 
-        // --- KLAVYE KONTROLLERİ ---
-        float paddleSpeed = 8.0f;
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) || sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
-            paddle.move(-paddleSpeed, 0.f);
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
-            paddle.move(paddleSpeed, 0.f);
-        }
+        // --- KONTROLLER (A-D / OKLAR) ---
+        float paddleSpeed = 9.0f;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) || sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) paddle.move(-paddleSpeed, 0.f);
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) || sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) paddle.move(paddleSpeed, 0.f);
 
-        // --- RAKET SINIR KONTROLÜ ---
         if (paddle.getPosition().x < 0) paddle.setPosition(0.f, paddle.getPosition().y);
         if (paddle.getPosition().x + paddle.getSize().x > 800) paddle.setPosition(800.f - paddle.getSize().x, paddle.getPosition().y);
 
-        // --- TOP HAREKETİ VE ÇARPIŞMALAR ---
+        // --- TOP HAREKETİ ---
         ball.move(ballSpeedX, ballSpeedY);
 
-        // Sağ ve Sol Duvar
-        if (ball.getPosition().x <= 0 || ball.getPosition().x + ball.getRadius() * 2 >= 800) ballSpeedX = -ballSpeedX;
-
-        // Tavan
+        if (ball.getPosition().x <= 0 || ball.getPosition().x + 20 >= 800) ballSpeedX = -ballSpeedX;
         if (ball.getPosition().y <= 0) ballSpeedY = -ballSpeedY;
 
-        // YERE DÜŞME (CAN KAYBI)
-        if (ball.getPosition().y + ball.getRadius() * 2 >= 600) {
-            lives--; // Canı 1 azalt
-
+        // Yere Düşme (Can Kaybı)
+        if (ball.getPosition().y + 20 >= 600) {
+            lives--;
             if (lives > 0) {
-                // Eğer canı bitmediyse pozisyonları sıfırla
-                paddle.setPosition(350.f, 550.f);
                 ball.setPosition(390.f, 300.f);
-                ballSpeedY = -5.0f; // Topu tekrar yukarı doğru yolla
+                paddle.setPosition(340.f, 550.f);
+                ballSpeedY = -5.0f;
             }
             else {
-                // Canı bittiyse oyun bitsin (Şimdilik pencereyi kapatıyoruz)
                 window.close();
             }
         }
 
-        // --- TOP VE RAKET ÇARPIŞMASI ---
         if (ball.getGlobalBounds().intersects(paddle.getGlobalBounds())) {
             ballSpeedY = -ballSpeedY;
-            ball.setPosition(ball.getPosition().x, paddle.getPosition().y - ball.getRadius() * 2);
+            ball.setPosition(ball.getPosition().x, paddle.getPosition().y - 20.f);
         }
 
-        // --- TOP VE BLOKLARIN ÇARPIŞMASI (KIRILMA) ---
         for (size_t i = 0; i < bricks.size(); ++i) {
             if (ball.getGlobalBounds().intersects(bricks[i].getGlobalBounds())) {
                 ballSpeedY = -ballSpeedY;
@@ -98,16 +83,25 @@ int main() {
             }
         }
 
-        // --- ÇİZİM İŞLEMLERİ ---
-        window.clear(sf::Color::Black);
+        // --- ÇİZİM ---
+        window.clear(sf::Color(30, 30, 30));
 
+        for (const auto& b : bricks) window.draw(b);
         window.draw(paddle);
         window.draw(ball);
-        for (const auto& brick : bricks) {
-            window.draw(brick);
+
+        // --- CAN GÖSTERGESİ (KÜÇÜK KARELER) ---
+        // Kaç canımız varsa o kadar küçük kırmızı kare çizdiriyoruz
+        for (int i = 0; i < lives; i++) {
+            sf::RectangleShape lifeIcon(sf::Vector2f(15.f, 15.f));
+            lifeIcon.setFillColor(sf::Color::Red);
+            // Sol üst köşede yan yana dizilmeleri için X koordinatını i ile çarpıyoruz
+            lifeIcon.setPosition(20.f + (i * 25.f), 20.f);
+            window.draw(lifeIcon);
         }
 
         window.display();
     }
+
     return 0;
 }
