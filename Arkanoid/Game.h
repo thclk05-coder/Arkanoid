@@ -1,11 +1,13 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include "Paddle.h" // raketi dahil ettim
+#include "Paddle.h" 
+#include "Ball.h"
 
 class Game {
 private:
     sf::RenderWindow window;
-    Paddle paddle; // raket objesi
+    Paddle paddle;
+    Ball ball;
 
     void processEvents();
     void update();
