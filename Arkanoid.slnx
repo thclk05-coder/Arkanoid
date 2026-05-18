@@ -3,5 +3,5 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="Arkanoid/Arkanoid.vcxproj" />
+  <Project Path="Arkanoid/Arkanoid.vcxproj" Id="d3d33a26-e724-4420-a100-e15efabdcb8c" />
 </Solution>
