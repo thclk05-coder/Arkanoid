@@ -3,15 +3,15 @@
 
 class Paddle {
 private:
-    sf::RectangleShape shape; // raketin sekli
-    float speed; // raketin hizi
+    sf::RectangleShape shape;
+    float speed;
 
 public:
     Paddle();
     void moveLeft();
     void moveRight();
-    void update(float screenWidth); // sinir kontrolu icin ekran genisligini parametre alcaz
-    void draw(sf::RenderWindow& window); // cizim isleri
-
-    sf::FloatRect getBounds() const; // ileride topun carpmasini algilamak icin hitbox lazim
+    void update(float screenWidth);
+    void draw(sf::RenderWindow& window);
+    sf::FloatRect getBounds() const;
+    void reset();
 };

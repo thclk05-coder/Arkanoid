@@ -2,8 +2,8 @@
 
 Game::Game() : window(sf::VideoMode(800, 600), "Kocaeli Uni Arkanoid - Parcali Sistem") {
     window.setFramerateLimit(60);
+    lives = 3; // baslangic cani 3
 
-    // Tuglalari ekrana 5 satir 10 sutun diziyoruz
     float startX = 50.f;
     float startY = 80.f;
     for (int i = 0; i < 5; ++i) {
@@ -43,6 +43,26 @@ void Game::update() {
     if (ball.getBounds().intersects(paddle.getBounds())) {
         ball.bounceOffPaddle(paddle.getBounds().top);
     }
+
+    for (size_t i = 0; i < bricks.size(); ++i) {
+        if (!bricks[i].isDestroyed() && ball.getBounds().intersects(bricks[i].getBounds())) {
+            bricks[i].destroy();
+            ball.bounceOffPaddle(bricks[i].getBounds().top + 40.f);
+            break;
+        }
+    }
+
+    // Top asagi dustu mu kontrolu
+    if (ball.getBounds().top > 600.f) {
+        lives--; // cani 1 azalt
+        if (lives > 0) {
+            paddle.reset();
+            ball.reset();
+        }
+        else {
+            window.close(); // can bittiyse simdilik kapansin
+        }
+    }
 }
 
 void Game::render() {
@@ -54,6 +74,14 @@ void Game::render() {
 
     paddle.draw(window);
     ball.draw(window);
+
+    // CAN GOSTERGESI 
+    for (int i = 0; i < lives; i++) {
+        sf::RectangleShape lifeIcon(sf::Vector2f(15.f, 15.f));
+        lifeIcon.setFillColor(sf::Color::Red);
+        lifeIcon.setPosition(20.f + (i * 25.f), 20.f);
+        window.draw(lifeIcon);
+    }
 
     window.display();
 }

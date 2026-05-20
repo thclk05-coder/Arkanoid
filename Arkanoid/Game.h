@@ -10,7 +10,8 @@ private:
     sf::RenderWindow window;
     Paddle paddle;
     Ball ball;
-    std::vector<Brick> bricks; 
+    std::vector<Brick> bricks;
+    int lives; // cani buraya tanimladik
 
     void processEvents();
     void update();

@@ -13,4 +13,5 @@ public:
     void draw(sf::RenderWindow& window);
     sf::FloatRect getBounds() const;
     void bounceOffPaddle(float paddleY);
+    void reset();
 };
