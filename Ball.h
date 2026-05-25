@@ -6,7 +6,6 @@ private:
     sf::CircleShape shape;
     float speedX;
     float speedY;
-
 public:
     Ball();
     void update(float screenWidth, float screenHeight);
@@ -14,4 +13,8 @@ public:
     sf::FloatRect getBounds() const;
     void bounceOffPaddle(float paddleY);
     void reset();
+
+    // YENİ EKLENENLER: Tuğlalardan pürüzsüz sekme için
+    void reverseY();
+    void reverseX();
 };

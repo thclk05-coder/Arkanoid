@@ -45,4 +45,9 @@
       <Filter>Üst Bilgi Dosyaları</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <Font Include="arial.ttf">
+      <Filter>Kaynak Dosyaları</Filter>
+    </Font>
+  </ItemGroup>
 </Project>
