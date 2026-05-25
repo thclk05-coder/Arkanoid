@@ -2,20 +2,26 @@
 
 // Tuğla oluşturulurken pozisyonunu ve can tipini belirliyoruz
 Brick::Brick(float x, float y, int type) {
-    shape.setSize(sf::Vector2f(60.f, 20.f)); // Sabit tuğla boyutu
+    shape.setSize(sf::Vector2f(60.f, 20.f));
     shape.setPosition(x, y);
     hp = type;
     destroyed = false;
 
     // Can tipine göre ilk renkleri atıyoruz
     if (hp == 1) {
-        shape.setFillColor(sf::Color::Red); // Normal tuğla kırmızı
+        shape.setFillColor(sf::Color::Red);       // 1 Can: Kırmızı
     }
     else if (hp == 2) {
-        shape.setFillColor(sf::Color::Magenta); // Sert tuğla mor
+        shape.setFillColor(sf::Color::Magenta);   // 2 Can: Mor
+    }
+    else if (hp == 3) {
+        shape.setFillColor(sf::Color::Green);     // 3 Can: Yeşil
+    }
+    else if (hp == 4) {
+        shape.setFillColor(sf::Color::Blue);      // 4 Can: Mavi
     }
     else if (hp == -1) {
-        shape.setFillColor(sf::Color(128, 128, 128)); // Kırılamaz duvar gri
+        shape.setFillColor(sf::Color(128, 128, 128)); // Kırılamaz: Gri
     }
 }
 
@@ -43,10 +49,17 @@ void Brick::hit() {
 
     hp--; // Canı 1 azalt
 
+    // Kırılmadıysa yeni canına göre rengini güncelle (Görsel tatmin)
     if (hp <= 0) {
-        destroyed = true; // Can bittiyse tuğlayı yok et
+        destroyed = true;
     }
     else if (hp == 1) {
-        shape.setFillColor(sf::Color::Red); // 2 canlı tuğla darbe alınca kırmızıya dönsün
+        shape.setFillColor(sf::Color::Red);
+    }
+    else if (hp == 2) {
+        shape.setFillColor(sf::Color::Magenta);
+    }
+    else if (hp == 3) {
+        shape.setFillColor(sf::Color::Green);
     }
 }
