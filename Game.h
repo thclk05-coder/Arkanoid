@@ -1,6 +1,8 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <vector>
+#include <cstdlib> // Rastgele sayilar icin
+#include <ctime>   // Zaman seed'i icin (hep ayni dizilim olmasin diye)
 #include "Ball.h"
 #include "Brick.h"
 #include "Paddle.h"
@@ -15,6 +17,10 @@ private:
     void processEvents();
     void update();
     void render();
+    bool isPlusPressed;
+
+    // YENİ: Otomatik bölüm yükleme sistemi
+    void loadLevel(int level);
 
     // Pencere
     sf::RenderWindow window;
