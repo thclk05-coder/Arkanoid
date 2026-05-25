@@ -22,10 +22,12 @@ private:
     // Font ve Skor Metni (Çift yazılanları sildim)
     sf::Font font;
     sf::Text scoreText;
+    sf::Text levelText; // Hata veren eksik metin objesi eklendi
 
     // Oyun Değişkenleri
     int lives;
     int score;
+    int currentLevel; // Hata veren eksik level değişkeni eklendi
 
     // Oyun Objeleri
     Paddle paddle;
