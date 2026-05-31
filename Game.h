@@ -6,6 +6,7 @@
 #include "Ball.h"
 #include "Brick.h"
 #include "Paddle.h"
+#include "Item.h"
 
 class Game {
 public:
@@ -14,6 +15,7 @@ public:
 
 private:
     // Temel oyun döngüsü fonksiyonları
+    std::vector<Item> items; // Ekranda süzülen itemleri tutacağımız liste
     void processEvents();
     void update();
     void render();
