@@ -6,7 +6,6 @@ Game::Game() : window(sf::VideoMode(1920, 1080), "Kocaeli Uni Arkanoid - Taha Ce
     srand(static_cast<unsigned>(time(NULL)));
     window.setFramerateLimit(60);
 
-    // 800x600'lük oyun dünyamızı 1920x1080 pencereye orantılı sığdırır
     sf::View view(sf::FloatRect(0, 0, 800, 600));
     window.setView(view);
 
@@ -15,34 +14,30 @@ Game::Game() : window(sf::VideoMode(1920, 1080), "Kocaeli Uni Arkanoid - Taha Ce
     currentLevel = 1;
     isPlusPressed = false;
 
-    // YENİ VE GARANTİLİ: Arka Plan Yükleme
-    // Resmi fontun olduğu ana klasöre koyduğundan emin ol!
     if (!bgTexture.loadFromFile("C:\\Users\\thclk\\Desktop\\Arkanoid\\arkaplan.jpg")) {
-        std::cout << "ARKA PLAN BULUNAMADI! Lutfen arkaplan.jpg dosyasini Arkanoid klasorune at." << std::endl;
+        std::cout << "ARKA PLAN BULUNAMADI!" << std::endl;
     }
     else {
         bgSprite.setTexture(bgTexture);
-        // Resmi bizim oyun alanımıza (800x600) tam sığacak şekilde esnetiyoruz
         bgSprite.setScale(800.f / bgTexture.getSize().x, 600.f / bgTexture.getSize().y);
     }
 
-    // Font Yükleme
     if (!font.loadFromFile("C:\\Users\\thclk\\Desktop\\Arkanoid\\font.ttf")) {
         std::cout << "FONT YUKLENEMEDI" << std::endl;
     }
 
-    // Skor ve Level Metinleri (Neon Renkler)
+    // ARAYÜZ (UI) RESİMDEKİ GİBİ ÜST ORTAYA ALINDI
     scoreText.setFont(font);
-    scoreText.setCharacterSize(24);
-    scoreText.setFillColor(sf::Color::Cyan); // Neon Mavi
-    scoreText.setPosition(20.f, 20.f);
-    scoreText.setString("Skor: 0");
+    scoreText.setCharacterSize(26);
+    scoreText.setFillColor(sf::Color(135, 206, 250)); // Açık Mavi
+    scoreText.setPosition(250.f, 15.f);
+    scoreText.setString("Puan: 0");
 
-    levelText.setFont(font);
-    levelText.setCharacterSize(24);
-    levelText.setFillColor(sf::Color::Magenta); // Neon Pembe/Mor
-    levelText.setPosition(650.f, 20.f);
-    levelText.setString("Level: 1");
+    levelText.setFont(font); // levelText'i Canlar yazısı için kullanıyoruz
+    levelText.setCharacterSize(26);
+    levelText.setFillColor(sf::Color(135, 206, 250)); // Açık Mavi
+    levelText.setPosition(450.f, 15.f);
+    levelText.setString("Canlar: 3");
 
     loadLevel(currentLevel);
 }
@@ -51,8 +46,9 @@ void Game::loadLevel(int level) {
     bricks.clear();
     items.clear();
 
-    float startX = 50.f;
-    float startY = 80.f;
+    // TUĞLALAR RESİMDEKİ GİBİ BİRBİRİNE YAKINLAŞTIRILDI
+    float startX = 25.f; // Ekranı ortalamak için
+    float startY = 80.f; // UI kısmına çarpmamak için aşağıdan başla
 
     int rows = 4 + (level / 5);
     if (rows > 8) rows = 8;
@@ -66,10 +62,10 @@ void Game::loadLevel(int level) {
             else if (level > 10 && (rand() % 100 < 20 + (level / 4))) { type = 3; }
             else if (level >= 3 && (rand() % 100 < 25 + (level / 3))) { type = 2; }
 
-            bricks.push_back(Brick(startX + j * 70.f, startY + i * 30.f, type));
+            // 75.f ve 30.f aralıklarla sıkı sıkı diziyoruz
+            bricks.push_back(Brick(startX + j * 75.f, startY + i * 30.f, type));
         }
     }
-    levelText.setString("Level: " + std::to_string(level));
     paddle.reset();
     ball.reset();
 }
@@ -138,7 +134,7 @@ void Game::update() {
 
             if (bricks[i].isDestroyed()) {
                 score += 10;
-                scoreText.setString("Skor: " + std::to_string(score));
+                scoreText.setString("Puan: " + std::to_string(score));
 
                 if (rand() % 100 < 25) {
                     int randomType = (rand() % 3) + 1;
@@ -154,22 +150,25 @@ void Game::update() {
 
     if (ball.getBounds().top > 600.f) {
         lives--;
+        levelText.setString("Canlar: " + std::to_string(lives)); // Arayüzü güncelle
         if (lives > 0) {
             paddle.reset();
             ball.reset();
         }
     }
 
-    // İtem Döngüsü
     for (int i = 0; i < items.size(); i++) {
         items[i].update();
 
         if (items[i].getBounds().intersects(paddle.getBounds())) {
             int type = items[i].getType();
-            if (type == 1) { score += 50; scoreText.setString("Skor: " + std::to_string(score)); }
-            else if (type == 2) { lives++; }
-            else if (type == 3) { lives--; if (lives <= 0) { paddle.reset(); ball.reset(); } }
-
+            if (type == 1) { score += 50; scoreText.setString("Puan: " + std::to_string(score)); }
+            else if (type == 2) { lives++; levelText.setString("Canlar: " + std::to_string(lives)); }
+            else if (type == 3) {
+                lives--;
+                levelText.setString("Canlar: " + std::to_string(lives));
+                if (lives <= 0) { paddle.reset(); ball.reset(); }
+            }
             items.erase(items.begin() + i);
             i--;
         }
@@ -181,21 +180,19 @@ void Game::update() {
 }
 
 void Game::render() {
-    window.clear(); // Ekranı temizle
-
-    // 1. Önce Arka Planı Çiz!
+    window.clear();
     window.draw(bgSprite);
 
-    // 2. Sonra diğer her şeyi çiz
+    // Kırmızı can kutucuklarını çizen for döngüsünü tamamen sildik, arayüz daha temiz.
+
+    // UI bölgesini ayırmak için ince bir çizgi (Opsiyonel estetik)
+    sf::RectangleShape topBar(sf::Vector2f(800.f, 2.f));
+    topBar.setPosition(0.f, 60.f);
+    topBar.setFillColor(sf::Color(138, 43, 226, 100)); // Şeffaf Mor
+    window.draw(topBar);
+
     for (auto& brick : bricks) { brick.draw(window); }
     for (auto& item : items) { item.draw(window); }
-
-    for (int i = 0; i < lives; i++) {
-        sf::RectangleShape lifeIcon(sf::Vector2f(15.f, 15.f));
-        lifeIcon.setFillColor(sf::Color::Red);
-        lifeIcon.setPosition(20.f + (i * 25.f), 550.f);
-        window.draw(lifeIcon);
-    }
 
     window.draw(scoreText);
     window.draw(levelText);
@@ -214,10 +211,10 @@ void Game::render() {
     else if (currentLevel > 100) {
         sf::Text winText;
         winText.setFont(font);
-        winText.setString("TEBRIKLER 100 LEVEL GECILDI!");
-        winText.setCharacterSize(45);
+        winText.setString("TEBRIKLER!");
+        winText.setCharacterSize(60);
         winText.setFillColor(sf::Color::Green);
-        winText.setPosition(80.f, 250.f);
+        winText.setPosition(220.f, 250.f);
         window.draw(winText);
     }
 

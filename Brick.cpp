@@ -1,34 +1,36 @@
 #include "Brick.h"
 
-// Tuğla oluşturulurken pozisyonunu ve can tipini belirliyoruz
 Brick::Brick(float x, float y, int type) {
-    shape.setSize(sf::Vector2f(60.f, 20.f));
+    // Tuğlaları resimdeki gibi daha kalın yaptık
+    shape.setSize(sf::Vector2f(70.f, 25.f));
     shape.setPosition(x, y);
     hp = type;
     destroyed = false;
 
-    // Can tipine göre ilk renkleri atıyoruz
+    // Tamamen boşaltmak yerine içine çok hafif karanlık bir cam efekti veriyoruz
+    shape.setFillColor(sf::Color(20, 20, 30, 180));
+    shape.setOutlineThickness(2.f);
+
+    // Resimdeki renk paleti (Mor, Turkuaz, Pembe)
     if (hp == 1) {
-        shape.setFillColor(sf::Color::Red);       // 1 Can: Kırmızı
+        shape.setOutlineColor(sf::Color(138, 43, 226)); // Mor
     }
     else if (hp == 2) {
-        shape.setFillColor(sf::Color::Magenta);   // 2 Can: Mor
+        shape.setOutlineColor(sf::Color(0, 255, 255));   // Turkuaz
     }
     else if (hp == 3) {
-        shape.setFillColor(sf::Color::Green);     // 3 Can: Yeşil
+        shape.setOutlineColor(sf::Color(255, 20, 147));  // Derin Pembe
     }
     else if (hp == 4) {
-        shape.setFillColor(sf::Color::Blue);      // 4 Can: Mavi
+        shape.setOutlineColor(sf::Color(148, 0, 211));   // Koyu Mor
     }
     else if (hp == -1) {
-        shape.setFillColor(sf::Color(128, 128, 128)); // Kırılamaz: Gri
+        shape.setOutlineColor(sf::Color(100, 100, 100)); // Kırılamaz Gri
     }
 }
 
 void Brick::draw(sf::RenderWindow& window) {
-    if (!destroyed) {
-        window.draw(shape);
-    }
+    if (!destroyed) window.draw(shape);
 }
 
 sf::FloatRect Brick::getBounds() const {
@@ -43,23 +45,19 @@ int Brick::getHp() const {
     return hp;
 }
 
-// Top çarptığında çalışacak yer
 void Brick::hit() {
-    if (hp == -1) return; // Kırılamaz duvarda hiçbir şey yapma
-
-    hp--; // Canı 1 azalt
-
-    // Kırılmadıysa yeni canına göre rengini güncelle (Görsel tatmin)
+    if (hp == -1) return;
+    hp--;
     if (hp <= 0) {
         destroyed = true;
     }
     else if (hp == 1) {
-        shape.setFillColor(sf::Color::Red);
+        shape.setOutlineColor(sf::Color(138, 43, 226));
     }
     else if (hp == 2) {
-        shape.setFillColor(sf::Color::Magenta);
+        shape.setOutlineColor(sf::Color(0, 255, 255));
     }
     else if (hp == 3) {
-        shape.setFillColor(sf::Color::Green);
+        shape.setOutlineColor(sf::Color(255, 20, 147));
     }
 }
