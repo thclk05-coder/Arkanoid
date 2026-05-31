@@ -37,6 +37,7 @@ Game::Game() : window(sf::VideoMode(800, 600), "Kocaeli Uni Arkanoid - Taha Celi
 // BÖLÜM YÜKLEME VE YENİ DENGELİ ZORLUK ALGORİTMASI 
 void Game::loadLevel(int level) {
     bricks.clear();
+    items.clear(); // YENİ: Yeni levele geçerken eski itemleri ekrandan temizle
 
     float startX = 50.f;
     float startY = 80.f;
@@ -152,6 +153,17 @@ void Game::update() {
             if (bricks[i].isDestroyed()) {
                 score += 10;
                 scoreText.setString("Skor: " + std::to_string(score));
+
+                // YENİ: İtem düşürme mantığı (%25 ihtimal)
+                if (rand() % 100 < 25) {
+                    int randomType = (rand() % 3) + 1; // 1, 2 veya 3
+                    sf::FloatRect brickBounds = bricks[i].getBounds();
+                    // Tuğlanın ortasından düşsün
+                    float dropX = brickBounds.left + (brickBounds.width / 2.f) - 10.f;
+                    float dropY = brickBounds.top;
+
+                    items.push_back(Item(dropX, dropY, randomType));
+                }
             }
             break;
         }
@@ -164,6 +176,45 @@ void Game::update() {
             ball.reset();
         }
     }
+
+    // YENİ: İtem hareketleri ve raketle çarpışma kontrolü
+    for (int i = 0; i < items.size(); i++) {
+        items[i].update(); // İtemi aşağı kaydır
+
+        // İtem ekrandan aşağı düştüyse listeden sil
+        if (items[i].getBounds().top > 600.f) {
+            items.erase(items.begin() + i);
+            i--;
+            continue;
+        }
+
+        // İtem çubuğa çarptıysa
+        if (items[i].getBounds().intersects(paddle.getBounds())) {
+            int type = items[i].getType();
+
+            if (type == 1) {
+                // Tip 1 (Yeşil): Ekstra puan
+                score += 50;
+                scoreText.setString("Skor: " + std::to_string(score));
+            }
+            else if (type == 2) {
+                // Tip 2 (Mavi): Ekstra can
+                lives++;
+            }
+            else if (type == 3) {
+                // Tip 3 (Kırmızı): Can azaltır
+                lives--;
+                if (lives <= 0) {
+                    paddle.reset();
+                    ball.reset();
+                }
+            }
+
+            // İtemi yakaladık, etkisini uyguladık, ekrandan siliyoruz
+            items.erase(items.begin() + i);
+            i--;
+        }
+    }
 }
 
 void Game::render() {
@@ -171,6 +222,11 @@ void Game::render() {
 
     for (auto& brick : bricks) {
         brick.draw(window);
+    }
+
+    // YENİ: İtemleri çizdir
+    for (auto& item : items) {
+        item.draw(window);
     }
 
     for (int i = 0; i < lives; i++) {

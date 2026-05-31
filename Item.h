@@ -13,4 +13,4 @@ public:
     void draw(sf::RenderWindow& window);
     sf::FloatRect getBounds() const;
     int getType() const;
-}
+}; 
