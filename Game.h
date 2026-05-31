@@ -1,8 +1,11 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <vector>
-#include <cstdlib> // Rastgele sayilar icin
-#include <ctime>   // Zaman seed'i icin 
+#include <cstdlib> // Rastgele sayılar için
+#include <ctime>   // Zaman seed'i için 
+#include <string>  // std::string kullanımı için
+#include <fstream> // Dosya okuma (loadLevel için)
+#include <sstream> // Metin parçalama (loadLevel için)
 #include "Ball.h"
 #include "Brick.h"
 #include "Paddle.h"
@@ -18,15 +21,15 @@ private:
     void processEvents();
     void update();
     void render();
-    bool isPlusPressed;
 
     // YENİ: Otomatik bölüm yükleme sistemi
     void loadLevel(int level);
+    bool isPlusPressed;
 
     // Pencere
     sf::RenderWindow window;
 
-    // YENİ EKLENEN: Arka Plan Görseli için değişkenler
+    // Arka Plan Görseli
     sf::Texture bgTexture;
     sf::Sprite bgSprite;
 

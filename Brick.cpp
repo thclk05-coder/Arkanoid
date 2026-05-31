@@ -6,7 +6,7 @@ Brick::Brick(float x, float y, int type) {
     hp = type;
     destroyed = false;
 
-    updateTexture();
+    updateTexture(); // Başlangıç canına göre resmi yükle
 
     sprite.setPosition(x, y);
 
@@ -26,12 +26,13 @@ Brick::Brick(const Brick& other) {
 void Brick::updateTexture() {
     std::string path = "C:\\Users\\thclk\\Desktop\\Arkanoid\\";
 
-    // YENİ EKLENEN KISIM: -1 için duvar.png yüklenecek!
+    // TÜM RESİMLER VE 4. CAN DESTEĞİ AKTİF
     if (hp == 1) path += "tugla1.png";
     else if (hp == 2) path += "tugla2.png";
     else if (hp == 3) path += "tugla3.png";
-    else if (hp == -1) path += "duvar.png"; // Kırılamaz blok resmi
-    else path += "tugla1.png"; // Ne olur ne olmaz güvenlik duvarı
+    else if (hp == 4) path += "tugla4.png"; // <-- Yeni eklediğin resim burada devreye giriyor!
+    else if (hp == -1) path += "duvar.png"; // Kırılamaz blok
+    else path += "tugla1.png";
 
     if (!texture.loadFromFile(path)) {
         std::cout << "TUGLA RESMI YUKLENEMEDI: " << path << std::endl;
@@ -40,13 +41,13 @@ void Brick::updateTexture() {
 }
 
 void Brick::hit() {
-    if (hp == -1) return; // -1 ise canı hiç azaltma, kırılmasın
+    if (hp == -1) return;
     hp--;
     if (hp <= 0) {
         destroyed = true;
     }
     else {
-        updateTexture();
+        updateTexture(); // Canı her azaldığında bir alt canın rengine (resmine) bürünür
     }
 }
 
