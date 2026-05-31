@@ -4,6 +4,7 @@
 Game::Game() : window(sf::VideoMode(1920, 1080), "Kocaeli Uni Arkanoid - Taha Celik", sf::Style::Default) {
     srand(static_cast<unsigned>(time(NULL)));
     window.setFramerateLimit(60);
+
     sf::View view(sf::FloatRect(0, 0, 800, 600));
     window.setView(view);
 
@@ -32,6 +33,14 @@ Game::Game() : window(sf::VideoMode(1920, 1080), "Kocaeli Uni Arkanoid - Taha Ce
     menuOpt1.setFont(font); menuOpt1.setString("YENI OYUN"); menuOpt1.setCharacterSize(35); menuOpt1.setPosition(300.f, 300.f);
     menuOpt2.setFont(font); menuOpt2.setString("DEVAM ET"); menuOpt2.setCharacterSize(35); menuOpt2.setPosition(310.f, 360.f);
     menuOpt3.setFont(font); menuOpt3.setString("CIKIS"); menuOpt3.setCharacterSize(35); menuOpt3.setPosition(345.f, 420.f);
+    bufferTugla.loadFromFile("C:\\Users\\thclk\\Desktop\\Arkanoid\\tugla kirilma sesi.wav");
+    soundTugla.setBuffer(bufferTugla);
+
+    bufferMenu.loadFromFile("C:\\Users\\thclk\\Desktop\\Arkanoid\\menu sesleri.wav");
+    soundMenu.setBuffer(bufferMenu);
+
+    bufferGameOver.loadFromFile("C:\\Users\\thclk\\Desktop\\Arkanoid\\game over sesi.wav");
+    soundGameOver.setBuffer(bufferGameOver);
 }
 
 void Game::loadLevel(int level) {
@@ -80,6 +89,7 @@ void Game::processEvents() {
         }
 
         if (state == MENU && event.type == sf::Event::KeyPressed) {
+            if (event.key.code == sf::Keyboard::Up || event.key.code == sf::Keyboard::Down) soundMenu.play(); // Menü sesi
             if (event.key.code == sf::Keyboard::Up) { menuSelectedIndex--; if (menuSelectedIndex < 0) menuSelectedIndex = 2; }
             else if (event.key.code == sf::Keyboard::Down) { menuSelectedIndex++; if (menuSelectedIndex > 2) menuSelectedIndex = 0; }
             else if (event.key.code == sf::Keyboard::Enter) {
@@ -117,6 +127,7 @@ void Game::update() {
     for (size_t i = 0; i < bricks.size(); ++i) {
         if (!bricks[i].isDestroyed() && ball.getBounds().intersects(bricks[i].getBounds())) {
             bricks[i].hit(); ball.reverseY();
+            soundTugla.play(); // Tuğla sesi
             if (bricks[i].isDestroyed()) {
                 score += 10; scoreText.setString("Puan: " + std::to_string(score));
                 if (rand() % 100 < 25) { int randomType = (rand() % 3) + 1; sf::FloatRect bB = bricks[i].getBounds(); items.push_back(Item(bB.left + bB.width / 2.f, bB.top, randomType)); }
@@ -124,14 +135,19 @@ void Game::update() {
             break;
         }
     }
-    if (ball.getBounds().top > 600.f) { lives--; if (lives > 0) { paddle.reset(); ball.reset(); } else { state = GAMEOVER; } }
+    if (ball.getBounds().top > 600.f) {
+        lives--;
+        if (lives > 0) { paddle.reset(); ball.reset(); }
+        else { soundGameOver.play(); state = GAMEOVER; } // Game over sesi
+    }
+    // ...
     for (int i = 0; i < items.size(); i++) {
         items[i].update();
         if (items[i].getBounds().intersects(paddle.getBounds())) {
             int type = items[i].getType();
             if (type == 1) { score += 50; scoreText.setString("Puan: " + std::to_string(score)); }
             else if (type == 2) { lives++; }
-            else if (type == 3) { lives--; if (lives <= 0) { state = GAMEOVER; } }
+            else if (type == 3) { lives--; if (lives <= 0) { soundGameOver.play(); state = GAMEOVER; } }
             items.erase(items.begin() + i); i--;
         }
         else if (items[i].getBounds().top > 600.f) { items.erase(items.begin() + i); i--; }
@@ -150,7 +166,8 @@ void Game::render() {
     }
     else if (state == TRANSITION) {
         window.draw(darkOverlay);
-        centerText.setFillColor(sf::Color(138, 43, 226)); centerText.setPosition(150.f, 150.f); centerText.setString("BOLUM " + std::to_string(currentLevel) + " TAMAMLANDI!"); window.draw(centerText);
+        centerText.setFillColor(sf::Color(0, 0, 0, 200)); centerText.setPosition(154.f, 154.f); centerText.setString("BOLUM " + std::to_string(currentLevel) + " TAMAMLANDI!"); window.draw(centerText);
+        centerText.setFillColor(sf::Color(138, 43, 226)); centerText.setPosition(150.f, 150.f); window.draw(centerText);
         sf::Text statsText; statsText.setFont(font); statsText.setString(std::string("Mevcut Skor: ") + std::to_string(score) + "\n\nKalan Can: " + std::to_string(lives));
         statsText.setCharacterSize(30); statsText.setFillColor(sf::Color::Yellow); statsText.setPosition(280.f, 250.f); window.draw(statsText);
         sf::Text cont; cont.setFont(font); cont.setString(">> Devam Etmek Icin SPACE'e Bas <<"); cont.setCharacterSize(25); cont.setFillColor(sf::Color::Cyan); cont.setPosition(140.f, 420.f); window.draw(cont);
@@ -158,7 +175,8 @@ void Game::render() {
     }
     else if (state == GAMEOVER) {
         window.draw(darkOverlay);
-        centerText.setCharacterSize(60); centerText.setFillColor(sf::Color::Red); centerText.setPosition(250.f, 120.f); centerText.setString("OYUN BITTI"); window.draw(centerText);
+        centerText.setCharacterSize(60); centerText.setFillColor(sf::Color(0, 0, 0, 200)); centerText.setPosition(254.f, 124.f); centerText.setString("OYUN BITTI"); window.draw(centerText);
+        centerText.setFillColor(sf::Color::Red); centerText.setPosition(250.f, 120.f); window.draw(centerText);
         sf::Text statsText; statsText.setFont(font); statsText.setString(std::string("Final Skor: ") + std::to_string(score)); statsText.setCharacterSize(35); statsText.setFillColor(sf::Color::Yellow); statsText.setPosition(260.f, 230.f); window.draw(statsText);
         window.draw(signature);
     }

@@ -10,6 +10,7 @@
 #include "Brick.h"
 #include "Paddle.h"
 #include "Item.h"
+#include <SFML/Audio.hpp>
 
 class Game {
 public:
@@ -23,6 +24,8 @@ private:
     void update();
     void render();
     void loadLevel(int level);
+    sf::SoundBuffer bufferTugla, bufferMenu, bufferGameOver;
+    sf::Sound soundTugla, soundMenu, soundGameOver;
 
     GameState state;
     bool isPlusPressed;
