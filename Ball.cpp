@@ -1,45 +1,48 @@
 #include "Ball.h"
 #include <cmath>
+#include <iostream>
 
 Ball::Ball() {
-    shape.setRadius(9.f);
+    // Resmi Yüklüyoruz
+    if (!texture.loadFromFile("C:\\Users\\thclk\\Desktop\\Arkanoid\\top.png")) {
+        std::cout << "TOP RESMI YUKLENEMEDI!" << std::endl;
+    }
+    sprite.setTexture(texture);
 
-    // Resimdeki gibi içi beyaz, dışı Turkuaz parlamalı
-    shape.setFillColor(sf::Color::White);
-    shape.setOutlineThickness(3.f);
-    shape.setOutlineColor(sf::Color::Cyan);
+    // Eski yarıçap 9'du (Çap 18x18 yapar). Resmi bu boyuta sıkıştırıyoruz ki fizik bozulmasın.
+    sprite.setScale(18.f / texture.getSize().x, 18.f / texture.getSize().y);
+    sprite.setPosition(390.f, 300.f);
 
-    shape.setPosition(390.f, 300.f);
     speedX = 5.0f;
     speedY = -5.0f;
 }
 
 void Ball::update(float screenWidth, float screenHeight) {
-    shape.move(speedX, speedY);
+    sprite.move(speedX, speedY);
 
-    if (shape.getPosition().x <= 0 || shape.getPosition().x + (shape.getRadius() * 2) >= screenWidth) {
+    if (sprite.getPosition().x <= 0 || sprite.getPosition().x + sprite.getGlobalBounds().width >= screenWidth) {
         speedX = -speedX;
     }
-    if (shape.getPosition().y <= 0) {
+    if (sprite.getPosition().y <= 0) {
         speedY = -speedY;
     }
 }
 
 void Ball::draw(sf::RenderWindow& window) {
-    window.draw(shape);
+    window.draw(sprite);
 }
 
 sf::FloatRect Ball::getBounds() const {
-    return shape.getGlobalBounds();
+    return sprite.getGlobalBounds();
 }
 
 void Ball::bounceOffPaddle(float paddleY) {
     speedY = -std::abs(speedY);
-    shape.setPosition(shape.getPosition().x, paddleY - (shape.getRadius() * 2));
+    sprite.setPosition(sprite.getPosition().x, paddleY - sprite.getGlobalBounds().height);
 }
 
 void Ball::reset() {
-    shape.setPosition(390.f, 300.f);
+    sprite.setPosition(390.f, 300.f);
     speedX = 5.0f;
     speedY = -5.0f;
 }

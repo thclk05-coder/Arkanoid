@@ -2,10 +2,6 @@
 #include <SFML/Graphics.hpp>
 
 class Paddle {
-private:
-    sf::RectangleShape shape;
-    float speed;
-
 public:
     Paddle();
     void moveLeft();
@@ -14,4 +10,9 @@ public:
     void draw(sf::RenderWindow& window);
     sf::FloatRect getBounds() const;
     void reset();
+
+private:
+    sf::Sprite sprite;
+    sf::Texture texture;
+    float speed;
 };

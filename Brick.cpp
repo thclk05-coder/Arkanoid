@@ -1,48 +1,40 @@
 #include "Brick.h"
+#include <iostream>
+#include <string>
 
 Brick::Brick(float x, float y, int type) {
-    // Tuğlaları resimdeki gibi daha kalın yaptık
-    shape.setSize(sf::Vector2f(70.f, 25.f));
-    shape.setPosition(x, y);
     hp = type;
     destroyed = false;
 
-    // Tamamen boşaltmak yerine içine çok hafif karanlık bir cam efekti veriyoruz
-    shape.setFillColor(sf::Color(20, 20, 30, 180));
-    shape.setOutlineThickness(2.f);
+    updateTexture(); // Başlangıç canına göre ilk resmi yükle
 
-    // Resimdeki renk paleti (Mor, Turkuaz, Pembe)
-    if (hp == 1) {
-        shape.setOutlineColor(sf::Color(138, 43, 226)); // Mor
-    }
-    else if (hp == 2) {
-        shape.setOutlineColor(sf::Color(0, 255, 255));   // Turkuaz
-    }
-    else if (hp == 3) {
-        shape.setOutlineColor(sf::Color(255, 20, 147));  // Derin Pembe
-    }
-    else if (hp == 4) {
-        shape.setOutlineColor(sf::Color(148, 0, 211));   // Koyu Mor
-    }
-    else if (hp == -1) {
-        shape.setOutlineColor(sf::Color(100, 100, 100)); // Kırılamaz Gri
-    }
+    sprite.setPosition(x, y);
+    // Eski tuğla boyutlarına (70x25) oranlıyoruz
+    sprite.setScale(70.f / texture.getSize().x, 25.f / texture.getSize().y);
 }
 
-void Brick::draw(sf::RenderWindow& window) {
-    if (!destroyed) window.draw(shape);
+// C++ Vektör Koruyucusu (Beyaz kutu hatasını önler)
+Brick::Brick(const Brick& other) {
+    hp = other.hp;
+    destroyed = other.destroyed;
+    texture = other.texture;
+    sprite = other.sprite;
+    sprite.setTexture(texture);
 }
 
-sf::FloatRect Brick::getBounds() const {
-    return shape.getGlobalBounds();
-}
+void Brick::updateTexture() {
+    std::string path = "C:\\Users\\thclk\\Desktop\\Arkanoid\\";
 
-bool Brick::isDestroyed() const {
-    return destroyed;
-}
+    if (hp == 1) path += "tugla1.png";
+    else if (hp == 2) path += "tugla2.png";
+    else if (hp == 3) path += "tugla3.png";
+    else if (hp == 4) path += "tugla3.png"; // tugla4.png eklersen burayı değiştir
+    else path += "tugla1.png"; // Kırılamaz veya hata durumu
 
-int Brick::getHp() const {
-    return hp;
+    if (!texture.loadFromFile(path)) {
+        std::cout << "TUGLA RESMI YUKLENEMEDI: " << path << std::endl;
+    }
+    sprite.setTexture(texture);
 }
 
 void Brick::hit() {
@@ -51,13 +43,18 @@ void Brick::hit() {
     if (hp <= 0) {
         destroyed = true;
     }
-    else if (hp == 1) {
-        shape.setOutlineColor(sf::Color(138, 43, 226));
-    }
-    else if (hp == 2) {
-        shape.setOutlineColor(sf::Color(0, 255, 255));
-    }
-    else if (hp == 3) {
-        shape.setOutlineColor(sf::Color(255, 20, 147));
+    else {
+        updateTexture(); // Canı azalınca anında resmini değiştir!
     }
 }
+
+void Brick::draw(sf::RenderWindow& window) {
+    if (!destroyed) window.draw(sprite);
+}
+
+sf::FloatRect Brick::getBounds() const {
+    return sprite.getGlobalBounds();
+}
+
+bool Brick::isDestroyed() const { return destroyed; }
+int Brick::getHp() const { return hp; }
