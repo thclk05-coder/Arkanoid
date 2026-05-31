@@ -4,7 +4,7 @@
 class Brick {
 public:
     Brick(float x, float y, int type);
-    Brick(const Brick& other); // Vektör hatalarını önleyen Kopya Oluşturucu
+    Brick(const Brick& other); // Vektör çarpışma hatasını önleyen kritik kod
     void draw(sf::RenderWindow& window);
     sf::FloatRect getBounds() const;
     bool isDestroyed() const;
@@ -16,5 +16,5 @@ private:
     sf::Texture texture;
     int hp;
     bool destroyed;
-    void updateTexture(); // Can azaldıkça yeni rengi (resmi) yükler
+    void updateTexture();
 };
