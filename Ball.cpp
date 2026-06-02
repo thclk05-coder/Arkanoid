@@ -4,7 +4,7 @@
 
 Ball::Ball() {
     // Resmi Yüklüyoruz
-    if (!texture.loadFromFile("C:\\Users\\thclk\\Desktop\\Arkanoid\\top.png")) {
+    if (!texture.loadFromFile("assets/top.png")) {
         std::cout << "TOP RESMI YUKLENEMEDI!" << std::endl;
     }
     sprite.setTexture(texture);

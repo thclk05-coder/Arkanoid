@@ -24,7 +24,7 @@ Brick::Brick(const Brick& other) {
 }
 
 void Brick::updateTexture() {
-    std::string path = "C:\\Users\\thclk\\Desktop\\Arkanoid\\";
+    std::string path = "assets/";
 
     // TÜM RESİMLER VE 4. CAN DESTEĞİ AKTİF
     if (hp == 1) path += "tugla1.png";
@@ -52,7 +52,10 @@ void Brick::hit() {
 }
 
 void Brick::draw(sf::RenderWindow& window) {
-    if (!destroyed) window.draw(sprite);
+    if (!destroyed) {
+        sprite.setTexture(texture); // Beyaz kare hatası olmaması için adres tazelemesi
+        window.draw(sprite);
+    }
 }
 
 sf::FloatRect Brick::getBounds() const { return sprite.getGlobalBounds(); }

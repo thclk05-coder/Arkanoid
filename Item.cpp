@@ -26,7 +26,7 @@ Item::Item(const Item& other) {
 }
 
 void Item::updateTexture() {
-    std::string path = "C:\\Users\\thclk\\Desktop\\Arkanoid\\";
+    std::string path = "assets/"; // KANKA EKSİK OLAN KISIM TAM BURASIYDI, EKLENDİ!
 
     // Tipe göre ilgili PNG dosyasını seçiyoruz
     if (type == 1) path += "yildiz.png";       // Puan itemi
@@ -45,6 +45,7 @@ void Item::update() {
 }
 
 void Item::draw(sf::RenderWindow& window) {
+    sprite.setTexture(texture); // BEYAZ KUTU BUG'INI ÇÖZDÜK
     window.draw(sprite);
 }
 

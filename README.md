@@ -1,8 +1,7 @@
 Arkanoid - Kocaeli Üniversitesi Projesi
 Bu proje, Arkanoid oyununun modern C++ ve SFML kütüphanesi kullanılarak geliştirilmiş versiyonudur.
 
-Geliştirici
-Taha Çelik - Kocaeli Üniversitesi, Yazılım Mühendisliği
+Geliştirici: Taha Çelik - Kocaeli Üniversitesi, Yazılım Mühendisliği
 
 Oyun Hakkında
 Oyun, klasik bir tuğla kırma mekaniğine dayalı, bölüm geçişli ve ilerlemeli bir yapıya sahiptir. Oyuncunun temel amacı, topu çubukla kontrol ederek ekrandaki tüm tuğlaları kırmaktır.
@@ -12,7 +11,7 @@ Temel Özellikler
 
 Ses Efektleri: Tuğla kırılma, menü etkileşimleri ve oyun sonu bildirimleri için ses desteği.
 
-Arayüz Yönetimi: Menü, oyun içi, geçiş ekranı (Transition) ve Game Over durumlarını içeren profesyonel Game State yönetimi.
+Arayüz Yönetimi: Menü, oyun içi, geçiş ekranı (Transition) ve Game Over durumlarını içeren profesyonel Game State (Durum Makinesi) yönetimi.
 
 Hile Modu: + (Artı) tuşu ile hızlı bölüm geçişi.
 
@@ -30,17 +29,26 @@ Hızlı İlerleme: + tuşu.
 Devam Etme: Space (Boşluk) tuşu.
 
 Teknik Gereksinimler
-Dil: C++
+Dil: C++11 veya üzeri
 
-Kütüphane: SFML (Graphics, Window, Audio, System)
+Kütüphane: SFML 2.5 (Graphics, Window, Audio, System)
 
-IDE: Visual Studio (x64 yapılandırması önerilir)
+Derleme Aracı: CMake (Min. 3.10) ve Make (MinGW/GCC)
 
-Kurulum ve Çalıştırma
-Proje dosyalarını içeren klasörü açın.
+Kurulum ve Çalıştırma (CMake)
+Proje, çapraz platform derleme aracı olan CMake ile yapılandırılmıştır. Projeyi kendi ortamınızda derlemek için aşağıdaki adımları izleyin:
 
-.dll dosyalarının (sfml-audio-2.dll dahil) çalışma dizininde olduğundan emin olun.
+Proje dosyalarını içeren klasörün ana dizininde bir terminal (CMD, PowerShell veya Git Bash) açın.
 
-Visual Studio üzerinde "Release" modunda derleyin.
+CMake ile derleme dosyalarını oluşturmak için şu komutu çalıştırın:
 
-arkaplan.jpg, font.ttf ve wav dosyalarının tam dizin yollarının kod içerisinde belirtilen (C:\\Users\\thclk\\Desktop\\Arkanoid\\) dizinle eşleştiğini kontrol edin.
+Bash
+cmake .
+   *(Not: Windows üzerinde MinGW kullanıyorsanız `cmake -G "MinGW Makefiles" .` komutunu kullanabilirsiniz.)*
+3. Projeyi derlemek için:
+   ```bash
+make
+(Windows'ta MinGW için: mingw32-make)
+4. Derleme tamamlandıktan sonra oluşan Arkanoid.exe (veya Linux/Mac için Arkanoid) dosyasını çalıştırarak oyuna giriş yapabilirsiniz.
+
+⚠️ Önemli Not: Oyunun görsellerinin, bölüm tasarımlarının ve seslerinin eksiksiz yüklenmesi için assets/ klasörünün çalıştırılabilir dosya (.exe) ile aynı ana dizinde bulunduğundan emin olun. Projede mutlak (absolute) dosya yolları kullanılmamış olup, tüm kaynaklar assets/ klasörü üzerinden dinamik olarak çekilmektedir.

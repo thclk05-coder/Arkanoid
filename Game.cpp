@@ -15,7 +15,7 @@ Game::Game() : window(sf::VideoMode(1920, 1080), "Kocaeli Uni Arkanoid - Taha Ce
     isPlusPressed = false;
     menuSelectedIndex = 0;
 
-    if (!bgTexture.loadFromFile("C:\\Users\\thclk\\Desktop\\Arkanoid\\arkaplan.jpg")) {
+    if (!bgTexture.loadFromFile("assets/arkaplan.jpg")) {
         std::cout << "ARKA PLAN BULUNAMADI!" << std::endl;
     }
     else {
@@ -23,7 +23,7 @@ Game::Game() : window(sf::VideoMode(1920, 1080), "Kocaeli Uni Arkanoid - Taha Ce
         bgSprite.setScale(800.f / bgTexture.getSize().x, 600.f / bgTexture.getSize().y);
     }
 
-    font.loadFromFile("C:\\Users\\thclk\\Desktop\\Arkanoid\\font.ttf");
+    font.loadFromFile("assets/font.ttf");
 
     scoreText.setFont(font); scoreText.setCharacterSize(24); scoreText.setFillColor(sf::Color(135, 206, 250)); scoreText.setPosition(100.f, 15.f);
     levelText.setFont(font); levelText.setCharacterSize(24); levelText.setFillColor(sf::Color(138, 43, 226)); levelText.setPosition(600.f, 15.f);
@@ -33,13 +33,14 @@ Game::Game() : window(sf::VideoMode(1920, 1080), "Kocaeli Uni Arkanoid - Taha Ce
     menuOpt1.setFont(font); menuOpt1.setString("YENI OYUN"); menuOpt1.setCharacterSize(35); menuOpt1.setPosition(300.f, 300.f);
     menuOpt2.setFont(font); menuOpt2.setString("DEVAM ET"); menuOpt2.setCharacterSize(35); menuOpt2.setPosition(310.f, 360.f);
     menuOpt3.setFont(font); menuOpt3.setString("CIKIS"); menuOpt3.setCharacterSize(35); menuOpt3.setPosition(345.f, 420.f);
-    bufferTugla.loadFromFile("C:\\Users\\thclk\\Desktop\\Arkanoid\\tugla kirilma sesi.wav");
+
+    bufferTugla.loadFromFile("assets/tugla kirilma sesi.wav");
     soundTugla.setBuffer(bufferTugla);
 
-    bufferMenu.loadFromFile("C:\\Users\\thclk\\Desktop\\Arkanoid\\menu sesleri.wav");
+    bufferMenu.loadFromFile("assets/menu sesleri.wav");
     soundMenu.setBuffer(bufferMenu);
 
-    bufferGameOver.loadFromFile("C:\\Users\\thclk\\Desktop\\Arkanoid\\game over sesi.wav");
+    bufferGameOver.loadFromFile("assets/game over sesi.wav");
     soundGameOver.setBuffer(bufferGameOver);
 }
 
@@ -47,7 +48,7 @@ void Game::loadLevel(int level) {
     bricks.clear(); items.clear();
     float startX = 25.f; float startY = 80.f;
 
-    std::string filename = "C:\\Users\\thclk\\Desktop\\Arkanoid\\level" + std::to_string(level) + ".txt";
+    std::string filename = "assets/level" + std::to_string(level) + ".txt";
     std::ifstream file(filename);
 
     if (file.is_open()) {
@@ -63,11 +64,19 @@ void Game::loadLevel(int level) {
         file.close();
     }
     else {
-        int rows = 4 + (level / 5); if (rows > 8) rows = 8;
+        int rows = 4 + (level / 2);
+        if (rows > 8) rows = 8;
+
         for (int i = 0; i < rows; ++i) {
             for (int j = 0; j < 10; ++j) {
-                int type = 1;
-                bricks.push_back(Brick(startX + j * 75.f, startY + i * 30.f, type));
+                int type = (rand() % 3) + 1;
+
+                int boslukIhtimali = 25 - level;
+                if (boslukIhtimali < 0) boslukIhtimali = 0;
+
+                if ((rand() % 100) >= boslukIhtimali) {
+                    bricks.push_back(Brick(startX + j * 75.f, startY + i * 30.f, type));
+                }
             }
         }
     }
@@ -89,12 +98,16 @@ void Game::processEvents() {
         }
 
         if (state == MENU && event.type == sf::Event::KeyPressed) {
-            if (event.key.code == sf::Keyboard::Up || event.key.code == sf::Keyboard::Down) soundMenu.play(); // Menü sesi
+            if (event.key.code == sf::Keyboard::Up || event.key.code == sf::Keyboard::Down) {
+                if (soundMenu.getStatus() != sf::Sound::Playing) {
+                    soundMenu.play(); // Menü sesi
+                }
+            }
             if (event.key.code == sf::Keyboard::Up) { menuSelectedIndex--; if (menuSelectedIndex < 0) menuSelectedIndex = 2; }
             else if (event.key.code == sf::Keyboard::Down) { menuSelectedIndex++; if (menuSelectedIndex > 2) menuSelectedIndex = 0; }
             else if (event.key.code == sf::Keyboard::Enter) {
-                if (menuSelectedIndex == 0) { lives = 3; score = 0; currentLevel = 1; state = PLAYING; loadLevel(currentLevel); }
-                else if (menuSelectedIndex == 1) { if (lives <= 0) { lives = 3; loadLevel(currentLevel); } state = PLAYING; }
+                if (menuSelectedIndex == 0) { lives = 3; score = 0; currentLevel = 1; state = PLAYING; soundMenu.stop(); loadLevel(currentLevel); }
+                else if (menuSelectedIndex == 1) { if (lives <= 0) { lives = 3; loadLevel(currentLevel); } state = PLAYING; soundMenu.stop(); }
                 else if (menuSelectedIndex == 2) { window.close(); }
             }
         }

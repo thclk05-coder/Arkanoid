@@ -2,7 +2,7 @@
 #include <iostream>
 
 Paddle::Paddle() {
-    if (!texture.loadFromFile("C:\\Users\\thclk\\Desktop\\Arkanoid\\cubuk.png")) {
+    if (!texture.loadFromFile("assets/cubuk.png")) {
         std::cout << "CUBUK RESMI YUKLENEMEDI!" << std::endl;
     }
     sprite.setTexture(texture);
